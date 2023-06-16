@@ -201,12 +201,6 @@
           "y": 220,
           "type": "link",
           "path": "/Applications"
-        },
-        {
-          "x": 270,
-          "y": 60,
-          "type": "file",
-          "path": "template.docx"
         }
       ]
     },
@@ -231,8 +225,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "mclarence",
+      "repo": "SnipeIT-Contract-Generator"
     }
   },
   "collective": {
