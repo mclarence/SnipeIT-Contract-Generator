@@ -21,6 +21,10 @@ A electron based application that generates IT agreement documents using data fr
 * Bulk contract generation.
 
 ## Download
+* Install libreoffice. This is required for PDF generation.
+  * Windows: https://www.libreoffice.org/download/download/
+  * MacOS: `brew cask install libreoffice`
+  * Linux: `sudo apt install libreoffice` or whatever package manager your distro uses.
 * Prebuilt binaries are available for Windows, MacOS and Linux on the releases page.
 * The MacOS app is signed and notarized.
 * On first start, you will need to configure your SnipeIT API URL, API key and template location. This can be done under the 'Settings' tab.
