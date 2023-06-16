@@ -11,22 +11,24 @@ interface IArgs {
 }
 
 export default async function GeneratePdf(event: any, args: IArgs) {
-  const docx = require('docx');
-  const {
-    patchDocument,
-  } = docx;
-  const libre = require('libreoffice-convert');
-  libre.convertAsync = require('util').promisify(libre.convert);
-  const fs = require('fs');
-
-  const patches = await import(path.resolve(args.templateDefinition));
-
   try {
+    const docx = require('docx');
+    const {
+      patchDocument,
+    } = docx;
+    const libre = require('libreoffice-convert');
+    libre.convertAsync = require('util').promisify(libre.convert);
+    const fs = require('fs');
+
+    // import the user specfied javascript file
+    const patches = require('../misc/patches');
+    const patchesObj = patches.default(args);
+
     patchDocument(
       fs.readFileSync(path.resolve(args.templatePath)),
       {
         patches : {
-          ...patches.default(docx, args)
+          ...patchesObj
         }
       }
     )

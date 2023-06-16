@@ -357,7 +357,9 @@ export default function SingleGenerate(props: SingleGenerateProps) {
                 Browse
               </Button>
             </Stack>
-            <Tooltip title={appState.templateLocation === '' ? 'Contract template is missing. Please select one in settings.' : undefined} arrow>
+            <Tooltip title={
+              appState.templateLocation === '' ? 'Contract template is missing. Please select one in settings.' : undefined
+              } arrow>
               <span style={{ width: '100%' }}>
                 <Button
                   fullWidth
@@ -373,7 +375,6 @@ export default function SingleGenerate(props: SingleGenerateProps) {
                       }),
                       filePath: saveFileLocation,
                       templatePath: appState.templateLocation,
-                      templateDefinition: appState.templateDefinition,
                     });
                     setIsGeneratingPDF(true);
                     dispatch(AppStateSlice.actions.setIsProcessing(true));

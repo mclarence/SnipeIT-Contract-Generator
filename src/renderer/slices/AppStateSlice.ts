@@ -6,7 +6,6 @@ const initialState: AppState = {
     snipeItAccessToken: '',
     snipeItLoggedInUser: '',
     templateLocation: '',
-    templateDefinition: '',
     sslVerification: true,
     connectionStatus: 'disconnected',
     connectionError: '',
@@ -55,9 +54,6 @@ const AppStateSlice = createSlice({
         },
         setAppVersion: (state, action: PayloadAction<string>) => {
             state.appVersion = action.payload;
-        },
-        setTemplateDefinition: (state, action: PayloadAction<string>) => {
-            state.templateDefinition = action.payload;
         }
     }
 });

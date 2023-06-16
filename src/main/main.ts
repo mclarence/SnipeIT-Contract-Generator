@@ -8,15 +8,21 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog, session, ipcRenderer } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import {
+  BrowserWindow,
+  app,
+  ipcMain,
+  shell
+} from 'electron';
 import log from 'electron-log';
-import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
-import SaveFile from './functions/saveFile';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
 import GeneratePdf from './functions/generatePdf';
 import OpenFile from './functions/openFile';
+import SaveFile from './functions/saveFile';
+import MenuBuilder from './menu';
+import { resolveHtmlPath } from './util';
+
 
 class AppUpdater {
   constructor() {
@@ -33,7 +39,7 @@ ipcMain.on('open-file', OpenFile);
 ipcMain.on('generate-pdf', GeneratePdf);
 ipcMain.on('get-app-version', (event) => {
   event.reply('get-app-version', app.getVersion());
-})
+});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -52,9 +58,7 @@ const installExtensions = async () => {
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
   return installer
-    .default(
-      extensions.map((name) => installer[name]),
-    )
+    .default(extensions.map((name) => installer[name]))
     .catch(console.log);
 };
 

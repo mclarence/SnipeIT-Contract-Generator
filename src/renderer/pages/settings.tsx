@@ -18,9 +18,6 @@ export default function Settings(props: SettingsProps) {
   const [editedTemplateLocation, setEditedTemplateLocation] = useState(
     appState.templateLocation
   );
-  const [editedTemplateDefinition, setEditedTemplateDefinition] = useState(
-    appState.templateDefinition
-  );
   const [editedSslVerification, setEditedSslVerification] = useState(
     appState.sslVerification
   );
@@ -32,9 +29,7 @@ export default function Settings(props: SettingsProps) {
 
     window.electron.ipcRenderer.on('open-file', (event: any, arg: any) => {
       if (!event.canceled) {
-        if (event.caller === 'template-definition') {
-          setEditedTemplateDefinition(event.filePaths[0]);
-        } else if (event.caller === 'template-location') {
+        if (event.caller === 'template-location') {
           setEditedTemplateLocation(event.filePaths[0]);
         }
         
@@ -47,15 +42,13 @@ export default function Settings(props: SettingsProps) {
       editedSnipeItUrl !== appState.snipeItUrl ||
         editedSnipeItAccessToken !== appState.snipeItAccessToken ||
         editedTemplateLocation !== appState.templateLocation ||
-        editedSslVerification !== appState.sslVerification ||
-        editedTemplateDefinition !== appState.templateDefinition
+        editedSslVerification !== appState.sslVerification
     );
   }, [
     editedSnipeItUrl,
     editedSnipeItAccessToken,
     editedTemplateLocation,
     editedSslVerification,
-    editedTemplateDefinition,
   ]);
 
   const onSave = () => {
@@ -63,14 +56,12 @@ export default function Settings(props: SettingsProps) {
     localStorage.setItem('snipeit-access-token', editedSnipeItAccessToken);
     localStorage.setItem('template-location', editedTemplateLocation);
     localStorage.setItem('ssl-verification', editedSslVerification.toString());
-    localStorage.setItem('template-definition', editedTemplateDefinition);
     dispatch(AppStateSlice.actions.setSnipeItUrl(editedSnipeItUrl));
     dispatch(
       AppStateSlice.actions.setSnipeItAccessToken(editedSnipeItAccessToken)
     );
     dispatch(AppStateSlice.actions.setTemplateLocation(editedTemplateLocation));
     dispatch(AppStateSlice.actions.setSslVerification(editedSslVerification));
-    dispatch(AppStateSlice.actions.setTemplateDefinition(editedTemplateDefinition));
     setShowSaveButton(false);
 
     dispatch(
@@ -135,36 +126,6 @@ export default function Settings(props: SettingsProps) {
                       },
                     ],
                     caller: 'template-location',
-                  });
-                }}
-              >
-                Browse
-              </Button>
-            </Stack>
-            <Stack direction="row" gap={2}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Template Definition"
-                helperText="A JavaScript (.js) file containing the template definition."
-                value={editedTemplateDefinition}
-                onChange={(event) => {
-                  setEditedTemplateDefinition(event.target.value);
-                }}
-                fullWidth
-              />
-              <Button
-                variant="contained"
-                onClick={() => {
-                  window.electron.ipcRenderer.sendMessage('open-file', {
-                    title: 'Select Template Definition JS File',
-                    filters: [
-                      {
-                        name: 'JavaScript File',
-                        extensions: ['js'],
-                      },
-                    ],
-                    caller: 'template-definition',
                   });
                 }}
               >
