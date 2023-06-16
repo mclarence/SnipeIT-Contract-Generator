@@ -2,18 +2,18 @@
   "description": "Generates PDF contracts using data from SnipeIT",
   "version": "1.0.0",
   "name": "snipeit-contract-generator",
-  "homepage": "https://github.com/Santa-Sophia-Catholic-College/snipeit-contract-generator",
+  "homepage": "https://github.com/mclarence/SnipeIT-Contract-Generator",
   "bugs": {
-    "url": "https://github.com/Santa-Sophia-Catholic-College/snipeit-contract-generator/issues"
+    "url": "https://github.com/mclarence/SnipeIT-Contract-Generator/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Santa-Sophia-Catholic-College/snipeit-contract-generator"
+    "url": "https://github.com/mclarence/SnipeIT-Contract-Generator"
   },
   "license": "MIT",
   "author": {
     "name": "Clarence Mesina",
-    "email": "cmesina3@parra.catholic.edu.au"
+    "email": "me@clarence.id.au"
   },
   "main": "./src/main/main.ts",
   "scripts": {
