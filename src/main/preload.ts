@@ -2,7 +2,16 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'save-file' | 'generate-pdf' | 'finished-generating-pdf' | "error-generating-pdf" | "open-file";
+const channels = [
+  'save-file',
+  'generate-pdf',
+  'finished-generating-pdf',
+  'error-generating-pdf',
+  'open-file',
+  'get-app-version',
+] as const;
+
+export type Channels = typeof channels[number];
 
 const electronHandler = {
   ipcRenderer: {

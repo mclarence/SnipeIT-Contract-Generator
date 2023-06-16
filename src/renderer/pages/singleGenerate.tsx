@@ -67,7 +67,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
   };
 
   useEffect(() => {
-    props.setAppBarTitle('Single Generate');
+    props.setAppBarTitle('Generate Single Contract');
     window.electron.ipcRenderer.on('save-file', (event: any, arg: any) => {
       if (!event.canceled) {
         setSaveFileLocation(event.filePath);
@@ -83,6 +83,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
           message: 'PDF generated successfully',
         })
       );
+      dispatch(AppStateSlice.actions.setIsProcessing(false));
     });
 
     window.electron.ipcRenderer.on('error-generating-pdf', (event: any, args: any) => {
@@ -94,6 +95,8 @@ export default function SingleGenerate(props: SingleGenerateProps) {
           message: 'Error generating PDF: ' + event.message,
         })
       );
+
+      dispatch(AppStateSlice.actions.setIsProcessing(false));
     });
   }, []);
 
@@ -221,6 +224,11 @@ export default function SingleGenerate(props: SingleGenerateProps) {
                 setUsernameError(false);
                 setUsernameFieldHelperText('');
               }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && username.length > 0) {
+                  handleUsernameSubmit();
+                }
+              }}
               required
               id="outlined-required"
               label="Username"
@@ -329,7 +337,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
               <TextField
                 required
                 id="outlined-required"
-                label="Output File Name"
+                label="Output File Name & Location"
                 sx={{ width: '100%' }}
                 value={saveFileLocation}
                 onChange={(event) => {
@@ -338,6 +346,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
               />
               <Button
                 variant="contained"
+                disabled={isGeneratingPDF}
                 onClick={() => {
                   window.electron.ipcRenderer.sendMessage('save-file', {
                     title: 'Save Contract',
@@ -353,7 +362,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
                 <Button
                   fullWidth
                   disabled={
-                    saveFileLocation === '' || appState.templateLocation === ''
+                    saveFileLocation === '' || appState.templateLocation === '' || isGeneratingPDF
                   }
                   variant="contained"
                   onClick={() => {
@@ -364,8 +373,10 @@ export default function SingleGenerate(props: SingleGenerateProps) {
                       }),
                       filePath: saveFileLocation,
                       templatePath: appState.templateLocation,
+                      templateDefinition: appState.templateDefinition,
                     });
                     setIsGeneratingPDF(true);
+                    dispatch(AppStateSlice.actions.setIsProcessing(true));
                   }}
                 >
                   {isGeneratingPDF ? (
@@ -379,7 +390,7 @@ export default function SingleGenerate(props: SingleGenerateProps) {
           </Stack>
         </AccordionDetails>
       </Accordion>
-      {stepOneComplete ? (
+      {(stepOneComplete && !isGeneratingPDF) ? (
         <SpeedDial
           ariaLabel="Reset"
           sx={{ position: 'fixed', bottom: 16, right: 16 }}

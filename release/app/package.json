@@ -1,12 +1,11 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
+  "name": "snipeit-contract-generator",
+  "version": "1.0.0",
+  "description": "Generates PDF contracts using data from SnipeIT",
   "license": "MIT",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Clarence Mesina",
+    "email": "cmesina3@parra.catholic.edu.au"
   },
   "main": "./dist/main/main.js",
   "scripts": {

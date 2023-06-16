@@ -5,6 +5,7 @@ import { title } from "process";
 interface Arguments {
   title: string;
   filters: { name: string; extensions: string[] }[];
+  caller: string;
 }
 
 export default async function OpenFile(event: IpcMainEvent, args: Arguments) {
@@ -14,8 +15,10 @@ export default async function OpenFile(event: IpcMainEvent, args: Arguments) {
         filters: args.filters,
     })
     .then((result) => {
-        console.log(result);
-        event.reply('open-file', result);
+        event.reply('open-file', {
+            ...result,
+            caller: args.caller,
+        });
     }
     );
 }

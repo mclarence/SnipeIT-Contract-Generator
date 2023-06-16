@@ -4,7 +4,16 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ErrorIcon from '@mui/icons-material/Error';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Alert, Chip, CircularProgress, Snackbar, Tooltip, useMediaQuery } from '@mui/material';
+import {
+  Alert,
+  Chip,
+  CircularProgress,
+  ListItemIcon,
+  Snackbar,
+  Stack,
+  Tooltip,
+  useMediaQuery,
+} from '@mui/material';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,6 +31,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
+import LooksOneIcon from '@mui/icons-material/LooksOne';
+import PinIcon from '@mui/icons-material/Pin';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { RootState, useAppDispatch } from './index';
 import BulkGenerate from './pages/bulkGenerate';
 import Settings from './pages/settings';
@@ -79,7 +91,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-
 export default function App() {
   const appState = useSelector((state: RootState) => state.appState);
   const dispatch = useAppDispatch();
@@ -107,155 +118,264 @@ export default function App() {
   };
 
   useEffect(() => {
-    const templateLocation = localStorage.getItem('template-location')
+    const templateLocation = localStorage.getItem('template-location');
     if (templateLocation !== null) {
-      dispatch(AppStateSlice.actions.setTemplateLocation(templateLocation))
+      dispatch(AppStateSlice.actions.setTemplateLocation(templateLocation));
     }
 
-    const snipeItUrl = localStorage.getItem('snipeit-url')
+    const snipeItUrl = localStorage.getItem('snipeit-url');
     if (snipeItUrl !== null) {
-      dispatch(AppStateSlice.actions.setSnipeItUrl(snipeItUrl))
+      dispatch(AppStateSlice.actions.setSnipeItUrl(snipeItUrl));
     }
 
-    const snipeItAccessToken = localStorage.getItem('snipeit-access-token')
+    const snipeItAccessToken = localStorage.getItem('snipeit-access-token');
     if (snipeItAccessToken !== null) {
-      dispatch(AppStateSlice.actions.setSnipeItAccessToken(snipeItAccessToken))
+      dispatch(AppStateSlice.actions.setSnipeItAccessToken(snipeItAccessToken));
     }
 
-    const sslVerification = localStorage.getItem('ssl-verification')
+    const sslVerification = localStorage.getItem('ssl-verification');
     if (sslVerification !== null) {
-      dispatch(AppStateSlice.actions.setSslVerification(sslVerification === 'true'))
+      dispatch(
+        AppStateSlice.actions.setSslVerification(sslVerification === 'true')
+      );
     }
-  }, [])
+
+    const templateDefinition = localStorage.getItem('template-definition');
+    if (templateDefinition !== null) {
+      dispatch(AppStateSlice.actions.setTemplateDefinition(templateDefinition));
+    }
+
+    window.electron.ipcRenderer.sendMessage('get-app-version');
+    window.electron.ipcRenderer.on('get-app-version', (event: any, args) => {
+      dispatch(AppStateSlice.actions.setAppVersion(event));
+    })
+  }, []);
 
   useEffect(() => {
     if (appState.snipeItUrl !== '' && appState.snipeItAccessToken !== '') {
-      dispatch(AppStateSlice.actions.setConnectionStatus('connecting'))
+      dispatch(AppStateSlice.actions.setConnectionStatus('connecting'));
       fetch(`${appState.snipeItUrl}/api/v1/users/me`, {
         headers: {
-          'Authorization': `Bearer ${appState.snipeItAccessToken}`
-        }
-      }).then((response) => {
-        if (response.status === 200) {
-          dispatch(AppStateSlice.actions.setConnectionStatus('connected'))
-          dispatch(AppStateSlice.actions.setConnectionError(''))
-          return response.json()
-        } else {
-          dispatch(AppStateSlice.actions.setConnectionStatus('failed'))
-          dispatch(AppStateSlice.actions.setConnectionError(`Connection failed with status code ${response.status}`))
-        }
-      }).then((data) => {
-        // not really an error, but the connection error is displayed as the tooltip for the connection status.
-        dispatch(AppStateSlice.actions.setConnectionError(`Connected as ${data.first_name} ${data.last_name} on ${appState.snipeItUrl}`))
-      }).catch((error) => {
-        dispatch(AppStateSlice.actions.setConnectionStatus('failed'))
-        dispatch(AppStateSlice.actions.setConnectionError(`Connection failed with error ${error}`))
+          Authorization: `Bearer ${appState.snipeItAccessToken}`,
+        },
       })
+        .then((response) => {
+          if (response.status === 200) {
+            dispatch(AppStateSlice.actions.setConnectionStatus('connected'));
+            dispatch(AppStateSlice.actions.setConnectionError(''));
+            return response.json();
+          }
+          dispatch(AppStateSlice.actions.setConnectionStatus('failed'));
+          dispatch(
+            AppStateSlice.actions.setConnectionError(
+              `Connection failed with status code ${response.status}`
+            )
+          );
+        })
+        .then((data) => {
+          // not really an error, but the connection error is displayed as the tooltip for the connection status.
+          dispatch(
+            AppStateSlice.actions.setConnectionError(
+              `Connected as ${data.first_name} ${data.last_name} on \n ${appState.snipeItUrl}`
+            )
+          );
+        })
+        .catch((error) => {
+          dispatch(AppStateSlice.actions.setConnectionStatus('failed'));
+          dispatch(
+            AppStateSlice.actions.setConnectionError(
+              `Connection failed with error ${error}`
+            )
+          );
+        });
     } else {
-      dispatch(AppStateSlice.actions.setConnectionStatus('disconnected'))
-      dispatch(AppStateSlice.actions.setConnectionError('Missing Connection Information'))
+      dispatch(AppStateSlice.actions.setConnectionStatus('disconnected'));
+      dispatch(
+        AppStateSlice.actions.setConnectionError(
+          'Missing Connection Information'
+        )
+      );
     }
-
-  }, [appState.snipeItUrl, appState.snipeItAccessToken, appState.sslVerification])
+  }, [
+    appState.snipeItUrl,
+    appState.snipeItAccessToken,
+    appState.sslVerification,
+  ]);
 
   return (
     <ThemeProvider theme={theme}>
       <Router>
-      <Box sx={{ display: 'flex'}}>
-        <CssBaseline />
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: 'none' }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div" sx={{flexGrow: 1}}>
-              {appBarTitle}
-            </Typography>
-            <Tooltip title={appState.connectionError} arrow>
-              <Chip 
-              variant='filled'
-              color={appState.connectionStatus === 'connected' ? 'success' : appState.connectionStatus === 'failed' ? 'error' : appState.connectionStatus === 'connecting' ? 'warning' : 'error'}
-              label={
-                appState.connectionStatus === 'connected' ? 'Connected to SnipeIT' : appState.connectionStatus === 'failed' ? 'SnipeIT Connection Failed' : appState.connectionStatus === 'connecting' ? 'Connecting to SnipeIT' : 'SnipeIT Connection Failed'
-              }
-              icon={
-                appState.connectionStatus === 'connected' ? <CheckIcon /> : appState.connectionStatus === 'failed' ? <ErrorIcon /> : appState.connectionStatus === 'connecting' ? <CircularProgress size={20} /> : <ErrorIcon />
-              }
-              />
-            </Tooltip>
-            
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <AppBar position="fixed" open={open}>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                disabled={appState.processingSomething}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ flexGrow: 1 }}
+              >
+                {appBarTitle}
+              </Typography>
+              <Tooltip
+                title={
+                  <div style={{ whiteSpace: 'pre-line', textAlign: 'center' }}>
+                    {appState.connectionError}
+                  </div>
+                }
+                arrow
+              >
+                <Chip
+                  variant="filled"
+                  color={
+                    appState.connectionStatus === 'connected'
+                      ? 'success'
+                      : appState.connectionStatus === 'failed'
+                      ? 'error'
+                      : appState.connectionStatus === 'connecting'
+                      ? 'warning'
+                      : 'error'
+                  }
+                  label={
+                    appState.connectionStatus === 'connected'
+                      ? 'Connected to SnipeIT'
+                      : appState.connectionStatus === 'failed'
+                      ? 'SnipeIT Connection Failed'
+                      : appState.connectionStatus === 'connecting'
+                      ? 'Connecting to SnipeIT'
+                      : 'SnipeIT Connection Failed'
+                  }
+                  icon={
+                    appState.connectionStatus === 'connected' ? (
+                      <CheckIcon />
+                    ) : appState.connectionStatus === 'failed' ? (
+                      <ErrorIcon />
+                    ) : appState.connectionStatus === 'connecting' ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <ErrorIcon />
+                    )
+                  }
+                />
+              </Tooltip>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            sx={{
               width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            <ListItem key={1} disablePadding>
-              <ListItemButton component={Link} to="/" onClick={() => setOpen(false)}>
-                <ListItemText primary={"Single Generate"} />
-              </ListItemButton>
-            </ListItem>
-            <ListItem key={2} disablePadding>
-              <ListItemButton component={Link} to="/bulk-generate" onClick={() => setOpen(false)} disabled>
-                <ListItemText primary={"Bulk Generate (Coming Soon)"} />
-              </ListItemButton>
-            </ListItem>
-            <ListItem key={3} disablePadding>
-              <ListItemButton component={Link} to="/settings" onClick={() => setOpen(false)}>
-                <ListItemText primary={"Settings"} />
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Drawer>
-        <Main open={open}>
-          <DrawerHeader />
-          
+              flexShrink: 0,
+              '& .MuiDrawer-paper': {
+                width: drawerWidth,
+                boxSizing: 'border-box',
+              },
+            }}
+            variant="persistent"
+            anchor="left"
+            open={open}
+          >
+            <DrawerHeader>
+              <Stack>
+                <Typography variant="body2" noWrap component="div">
+                  SnipeIT Asset Generator
+                </Typography>
+                <Typography variant="body2" noWrap component="div">
+                  Version {appState.appVersion}
+                </Typography>
+              </Stack>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? (
+                  <ChevronLeftIcon />
+                ) : (
+                  <ChevronRightIcon />
+                )}
+              </IconButton>
+            </DrawerHeader>
+            <Divider />
+            <List>
+              <ListItem key={1} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/"
+                  onClick={() => setOpen(false)}
+                >
+                  <ListItemIcon>
+                    <LooksOneIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Single Generate" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem key={2} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/bulk-generate"
+                  onClick={() => setOpen(false)}
+                  disabled
+                >
+                  <ListItemIcon>
+                    <PinIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Bulk Generate (Coming Soon)" />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem key={3} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/settings"
+                  onClick={() => setOpen(false)}
+                >
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Settings" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Drawer>
+          <Main open={open}>
+            <DrawerHeader />
+
             <Routes>
-              <Route path="/" element={<SingleGenerate setAppBarTitle={setAppBarTitle} />} />
-              <Route path="/bulk-generate" element={<BulkGenerate setAppBarTitle={setAppBarTitle} />} />
-              <Route path="/settings" element={<Settings setAppBarTitle={setAppBarTitle} />} />
+              <Route
+                path="/"
+                element={<SingleGenerate setAppBarTitle={setAppBarTitle} />}
+              />
+              <Route
+                path="/bulk-generate"
+                element={<BulkGenerate setAppBarTitle={setAppBarTitle} />}
+              />
+              <Route
+                path="/settings"
+                element={<Settings setAppBarTitle={setAppBarTitle} />}
+              />
             </Routes>
-          
-        </Main>
-      </Box>
-      <Snackbar
-        open={appState.snackBar.open}
-        autoHideDuration={3000}
-        onClose={() => dispatch(AppStateSlice.actions.closeSnackBar())}
-      >
-        <Alert
+          </Main>
+        </Box>
+        <Snackbar
+          open={appState.snackBar.open}
+          autoHideDuration={3000}
           onClose={() => dispatch(AppStateSlice.actions.closeSnackBar())}
-          severity={appState.snackBar.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
         >
-          {appState.snackBar.message}
-        </Alert>
-      </Snackbar>
-    </Router>
+          <Alert
+            onClose={() => dispatch(AppStateSlice.actions.closeSnackBar())}
+            severity={appState.snackBar.severity}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {appState.snackBar.message}
+          </Alert>
+        </Snackbar>
+      </Router>
     </ThemeProvider>
-    
   );
 }

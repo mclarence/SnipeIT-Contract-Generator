@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog, session } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog, session, ipcRenderer } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -31,6 +31,9 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.on('save-file', SaveFile);
 ipcMain.on('open-file', OpenFile);
 ipcMain.on('generate-pdf', GeneratePdf);
+ipcMain.on('get-app-version', (event) => {
+  event.reply('get-app-version', app.getVersion());
+})
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

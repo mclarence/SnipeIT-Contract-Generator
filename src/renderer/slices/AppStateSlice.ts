@@ -6,9 +6,12 @@ const initialState: AppState = {
     snipeItAccessToken: '',
     snipeItLoggedInUser: '',
     templateLocation: '',
+    templateDefinition: '',
     sslVerification: true,
     connectionStatus: 'disconnected',
     connectionError: '',
+    processingSomething: false,
+    appVersion: '',
     snackBar: {
         open: false,
         message: '',
@@ -46,6 +49,15 @@ const AppStateSlice = createSlice({
         },
         setLoggedInUser: (state, action: PayloadAction<string>) => {
             state.snipeItLoggedInUser = action.payload;
+        },
+        setIsProcessing: (state, action: PayloadAction<boolean>) => {
+            state.processingSomething = action.payload;
+        },
+        setAppVersion: (state, action: PayloadAction<string>) => {
+            state.appVersion = action.payload;
+        },
+        setTemplateDefinition: (state, action: PayloadAction<string>) => {
+            state.templateDefinition = action.payload;
         }
     }
 });
