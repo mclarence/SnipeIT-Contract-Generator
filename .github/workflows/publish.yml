@@ -1,9 +1,10 @@
 name: Publish
 
 on:
-  release:
-    types: ['published']
-
+  push:
+    branches:
+      - main
+    
 jobs:
   publish:
     runs-on: ${{ matrix.os }}
